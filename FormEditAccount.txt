@@ -1,0 +1,57 @@
+Public Class FormExtra
+    Private _DBAccess As New DataBaseAccess
+
+    Private _isEdit As Boolean = False
+    Public Sub New(IsEdit As Boolean)
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        _isEdit = IsEdit
+    End Sub
+    Private Function InsertAccount()
+        Dim sqlQuery As String = "insert into taikhoan (manhanvien,matkhau)"
+        sqlQuery += String.Format("values ('{0}','{1}')", TextBox1.Text, TextBox2.Text)
+        Return _DBAccess.ExecuteNoneQuery(sqlQuery)
+    End Function
+
+    Private Function UpdateAccount() As Boolean
+        Dim sqlQuery As String = String.Format("update taikhoan set matkhau = '{0}' where manhanvien = '{1}'", Me.TextBox2.Text, Me.TextBox1.Text)
+        Return _DBAccess.ExecuteNoneQuery(sqlQuery)
+    End Function
+
+    Private Function IsEmpty() As Boolean
+        Return String.IsNullOrEmpty(TextBox1.Text) OrElse String.IsNullOrEmpty(TextBox2.Text)
+    End Function
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        If IsEmpty() Then
+            MessageBox.Show("Hãy nhập giá trị vào trước khi ghi vào database", "Error", MessageBoxButtons.OK)
+        Else
+            If _isEdit Then
+                If UpdateAccount() Then
+                    MessageBox.Show("Sửa dữ liệu thành công!", "Information", MessageBoxButtons.OK)
+                    Me.DialogResult = Windows.Forms.DialogResult.OK
+                Else
+                    MessageBox.Show("Sửa dữ liệu không thành công!", "Error", MessageBoxButtons.OK)
+                    Me.DialogResult = Windows.Forms.DialogResult.No
+                End If
+            Else
+                If InsertAccount() Then
+                    MessageBox.Show("Thêm dữ liệu thành công!", "Information", MessageBoxButtons.OK)
+                    Me.DialogResult = Windows.Forms.DialogResult.OK
+                Else
+                    MessageBox.Show("Lỗi thêm dữ liệu!", "Error", MessageBoxButtons.OK)
+                    Me.DialogResult = Windows.Forms.DialogResult.No
+                End If
+                Me.Close()
+            End If
+        End If
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Me.Close()
+    End Sub
+
+End Class
