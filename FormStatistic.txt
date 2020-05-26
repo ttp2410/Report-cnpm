@@ -1,0 +1,53 @@
+Public Class FormStatistic
+    Private _DBAccess As New DataBaseAccess
+    Private Sub LoadDataOnGridView()
+        Dim sqlQuery As String = "select * from doanhthu"
+        Dim dTable As DataTable = _DBAccess.GetDataTable(sqlQuery)
+        Me.DataGridView1.DataSource = dTable
+        With Me.DataGridView1
+            .Columns(0).HeaderText = "Mã quản lí thống kê"
+            .Columns(1).HeaderText = "Tổng doanh thu"
+            .Columns(2).HeaderText = "Chỉ tiêu"
+            .Columns(3).HeaderText = "Ngày thống kê"
+            .Columns(3).DefaultCellStyle.Format = "yyyy/MM/dd"
+        End With
+    End Sub
+    Private Sub FormStatistic_Load(sender As Object, Enabled As EventArgs) Handles MyBase.Load
+        LoadDataOnGridView()
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Dim frm As New FormExtra(False)
+        frm.ShowDialog()
+        If frm.DialogResult = Windows.Forms.DialogResult.OK Then
+            LoadDataOnGridView()
+        End If
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        Dim frm As New FormExtra(True)
+        With Me.DataGridView1
+            frm.TextBox1.Text = .Rows(.CurrentCell.RowIndex).Cells("maquanlithongke").Value
+            frm.TextBox2.Text = .Rows(.CurrentCell.RowIndex).Cells("tongdoanhthu").Value
+            frm.TextBox3.Text = .Rows(.CurrentCell.RowIndex).Cells("chitieu").Value
+            frm.TextBox4.Text = .Rows(.CurrentCell.RowIndex).Cells("ngaythongke").Value
+        End With
+        frm.ShowDialog()
+        If frm.DialogResult = Windows.Forms.DialogResult.OK Then
+            LoadDataOnGridView()
+        End If
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim ngaythongke As String = Me.DataGridView1.Rows(Me.DataGridView1.CurrentCell.RowIndex).Cells("ngaythongke").Value
+        Dim maquanlithongke As String = Me.DataGridView1.Rows(Me.DataGridView1.CurrentCell.RowIndex).Cells("maquanlithongke").Value
+        Dim sqlQuery As String = String.Format("delete doanhthu where ngaythongke = '{0}' and maquanlithongke = '{1}'", ngaythongke, maquanlithongke)
+
+        If _DBAccess.ExecuteNoneQuery(sqlQuery) Then
+            MessageBox.Show("Đã xóa dữ liệu thành công!")
+            LoadDataOnGridView()
+        Else
+            MessageBox.Show("Lỗi xóa dữ liệu!")
+        End If
+    End Sub
+End Class
