@@ -1,0 +1,48 @@
+Public Class FormAccount
+    Private _DBAccess As New DataBaseAccess
+    Private Sub LoadDataOnGridView()
+        Dim sqlQuery As String = "select * from taikhoan"
+        Dim dTable As DataTable = _DBAccess.GetDataTable(sqlQuery)
+        Me.DataGridView1.DataSource = dTable
+        With Me.DataGridView1
+            .Columns(0).HeaderText = "Mã nhân viên"
+            .Columns(1).HeaderText = "Mật khẩu"
+        End With
+    End Sub
+    Private Sub Formaccount_Load(sender As Object, Enabled As EventArgs) Handles MyBase.Load
+        LoadDataOnGridView()
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Dim frm As New FormExtra(False)
+        frm.ShowDialog()
+        If frm.DialogResult = Windows.Forms.DialogResult.OK Then
+            LoadDataOnGridView()
+        End If
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        Dim frm As New FormExtra(True)
+        With Me.DataGridView1
+            frm.TextBox1.Text = .Rows(.CurrentCell.RowIndex).Cells("manhanvien").Value
+            frm.TextBox2.Text = .Rows(.CurrentCell.RowIndex).Cells("matkhau").Value
+        End With
+        frm.ShowDialog()
+        If frm.DialogResult = Windows.Forms.DialogResult.OK Then
+            LoadDataOnGridView()
+        End If
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim manhanvien As String = Me.DataGridView1.Rows(Me.DataGridView1.CurrentCell.RowIndex).Cells("manhanvien").Value
+
+        Dim sqlQuery As String = String.Format("delete taikhoan where manhanvien = '{0}'", manhanvien)
+
+        If _DBAccess.ExecuteNoneQuery(sqlQuery) Then
+            MessageBox.Show("Đã xóa dữ liệu thành công!")
+            LoadDataOnGridView()
+        Else
+            MessageBox.Show("Lỗi xóa dữ liệu!")
+        End If
+    End Sub
+End Class
